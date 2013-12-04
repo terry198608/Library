@@ -10,7 +10,7 @@
 
  
 
-    public $max_size = '1000000';//设置上传文件大小
+    public $max_size = '100000000000000000000000000';//设置上传文件大小
 
     public $file_name = 'date';//重命名方式代表以时间命名，其他则使用给予的名称
 
@@ -142,7 +142,7 @@
 
             if(move_uploaded_file($tmp_name,$this->uploaded)){
 
-                $this->errmsg = '文件<font color=red>'.$this->uploaded.'</font>上传成功！';
+                //$this->errmsg = '文件<font color=red>'.$this->uploaded.'</font>上传成功！';
 
                 return TRUE;
 
@@ -263,7 +263,6 @@
      */
 
     public function set_dir($dir = null){
-
         $d = null;
         //检查路径是否存在
 
