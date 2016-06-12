@@ -1,0 +1,5 @@
+#at_userslist ul{border: 1px solid #ccc; padding: 1px; background-color: #fff; border-radius: 2px;}
+#at_userslist ul li{width: :100%; height: 24px; line-height: 24px; background-color: #fff; padding: 0 10px;}
+#at_userslist ul li.tit{color: #999; border-bottom: 1px dashed #eee;}
+#at_userslist ul li.on{background-color: #e8e8e8; cursor: pointer; color: #000;}
+#at_textarea{position:absolute;overflow:hidden;z-index:-9999; top:-999px; left:0; }

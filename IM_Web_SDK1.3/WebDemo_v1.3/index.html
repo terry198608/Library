@@ -1,0 +1,1973 @@
+<html>
+    <head>
+        <title>腾讯IM Web Demo(V1.3)</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="css/webim_demo.css" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-table.css" />
+        <style>
+            .ui-menu { width: 150px; }
+        </style>
+
+    </head>
+    <body>
+
+        <div class="aio" id="webim_demo">
+            <div class="titlebar">
+                <img id="p_my_face" />
+                <p id="t_my_name"></p>
+                <ul id="t_my_menu">
+                    <li>菜单
+                        <ul>
+
+                            <li>好友申请
+                                <ul>
+
+                                    <li id="getPendencyMenu" onclick="getPendency()">查看好友申请</li>
+
+                                </ul>
+                            </li>
+                            <li>好友
+                                <ul>
+                                    <li id="searchProfileByUserIdMenu" onclick="searchProfileByUserIdClick()">搜索用户</li>
+                                    <li id="getAllFriendMenu" onclick="getMyFriend()">我的好友</li>
+                                </ul>
+                            </li>
+                            <li>黑名单
+                                <ul>
+                                    <li id="getBlackListMenu" onclick="getBlackList()">我的黑名单</li>
+                                </ul>
+                            </li>
+                            <li>群组申请
+                                <ul>
+                                    <li id="getApplyJoinGroupPendencyMenu" onclick="getApplyJoinGroupPendency()">查看加群申请</li>
+                                </ul>
+                            </li>
+                            <li>群组
+                                <ul>
+                                    <li id="searchGroupMenu" onclick="searchGroupMenuClick()">搜索群组</li>
+                                    <li id="createGroupMenu" onclick="createGroupMenuClick()">创建群组</li>
+                                    <li id="getMyGroupMenu" onclick="getMyGroup()">我的群组</li>
+                                    <li id="getMyGroupSystemsMenu" onclick="getMyGroupSystemMsgs()">我的群组系统消息</li>
+                                </ul>
+                            </li>
+                            <li>设置
+                                <ul>
+                                    <li id="setProfilePortraitMenu" onclick="setProfilePortraitClick()">个人资料</li>
+                                    <li id="quitMenu" onclick="quitClick()">退出</li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+            <div class="sesspart">
+                <div class="accordion" id="accordionContact">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionContact" href="#collapseFriend">
+                                我的好友
+                            </a>
+                        </div>
+                        <div id="collapseFriend" class="accordion-body collapse">
+                            <div class="sesslist">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionContact" href="#collapseGroup">
+                                我的群组
+                            </a>
+                        </div>
+                        <div id="collapseGroup" class="accordion-body collapse">
+                            <div class="sesslist-group">
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="chatpart">
+                <div class="msgflow">
+
+                </div>
+                
+                <span id="msg_end" style="overflow:hidden"></span>
+                <div class="editbar">                                
+                    <a class="chat02_title_btn ctb01" onclick="showEmotionDialog()" title="选择表情"></a>
+                    <a class="chat02_title_btn ctb03" title="选择图片" onclick="selectPicClick()" href="#"> </a>
+                    <a class="chat02_title_btn ctb04" title="发送自定义消息" onclick="showEditCustomMsgDialog()" href="#"> </a>
+                    <div id="wl_faces_box" class="wl_faces_box">
+                        <div class="wl_faces_content">
+                            <div class="title">
+                                <ul>
+                                    <li class="title_name">常用表情</li>
+                                    <li class="wl_faces_close"><span
+                                            onclick='turnoffFaces_box()'>&nbsp;</span></li>
+                                </ul>
+                            </div>
+                            <div id="wl_faces_main" class="wl_faces_main">
+                                <ul id="emotionUL">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="wlf_icon"></div>
+                    </div>
+                </div>
+                <textarea class="msgedit" id="send_msg_text" onkeydown="onTextareaKeyDown()" cols="82" rows="5"></textarea>
+                <div class="sendbar">
+                    <button type="button" class="sendbtn" onclick="onSendMsg()">发送</button>
+                    <button type="button" class="closebtn" onclick="onClose()">关闭</button>
+                </div>
+            </div>
+            <div class="bottom"></div>
+        </div>
+
+        <div class="modal fade" id="search_profile_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="search_profile_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="search_profile_dialog_label">
+                            搜索用户
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <form class="form-inline" role="form"  id="sp_form" name="sp_form">
+                            <div class="form-group">
+                                <label class="sr-only" for="sp_to_account">帐号</label>
+                                <input type="text" class="form-control" id="sp_to_account"
+                                       placeholder="请输入用户ID" maxlength="50" onkeydown="if(event.keyCode==13)return false;">
+                            </div>
+
+                            <button type="button" class="btn btn-default" onclick="searchProfileByUserId()">搜索</button>
+                        </form>
+                        <table id="search_profile_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button> 
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="add_friend_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="add_friend_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="add_friend_dialog_label">
+                            申请加好友
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" >
+                            <input type="hidden" id="af_allow_type" >
+                            <div class="form-group">
+                                <label for="af_to_account" class="col-sm-2 control-label">对方帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="af_to_account"
+                                           placeholder="请输入对方帐号" readonly="readonly">
+                                </div>
+                            </div> 
+
+                            <div class="form-group">
+                                <label for="af_add_wording" class="col-sm-2 control-label">附言</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="af_add_wording"
+                                              rows="3" >你好，我想和你成为朋友~~</textarea>
+
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="applyAddFriend()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="get_my_friend_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_my_friend_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_my_friend_dialog_label">
+                            我的好友
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <table id="get_my_friend_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="delete_friend_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="delete_friend_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="delete_friend_dialog_label">
+                            删除好友
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;">
+                            <input type="hidden" id="df_sel_row_index" />
+                            <div class="form-group">
+                                <label for="df_to_account" class="col-sm-2 control-label">对方帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="df_to_account" 
+                                           placeholder="请输入对方帐号" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="df_type_radio" class="col-sm-2 control-label">操作</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="df_type_radio" id="df_type_both_radio" 
+                                               value="Delete_Type_Both" checked> 双向删除
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="df_type_radio" id="df_type_single_radio" 
+                                               value="Delete_Type_Single"> 单向删除
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="deleteFriend()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="get_black_list_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_black_list_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_black_list_dialog_label">
+                            我的黑名单
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <table id="get_black_list_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="set_profile_portrait_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="set_profile_portrait_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="set_profile_portrait_label">
+                            设置个人资料
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;" id="spp_form" name="spp_form">
+                            <div class="form-group">
+                                <label for="spp_nick" class="col-sm-2 control-label">昵称</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="spp_nick" 
+                                           placeholder="请输入昵称" maxlength="20">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="spp_gender_radio" class="col-sm-2 control-label">性别</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="spp_gender_radio" id="spp_gender_male_radio" 
+                                               value="Gender_Type_Male"> 男
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="spp_gender_radio" id="spp_gender_female_radio" 
+                                               value="Gender_Type_Female"> 女
+                                    </label>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="spp_allow_type_radio" class="col-sm-2 control-label">加好友设置</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="spp_allow_type_radio" id="spp_allow_type_need_confirm_radio" 
+                                               value="AllowType_Type_NeedConfirm" > 需要确认
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="spp_allow_type_radio" id="spp_allow_type_allow_any_radio" 
+                                               value="AllowType_Type_AllowAny"> 允许任何人
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="spp_allow_type_radio" id="spp_allow_type_deny_any_radio" 
+                                               value="AllowType_Type_DenyAny"> 拒绝任何人
+                                    </label>
+
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                 data-dismiss="modal" >
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="setProfilePortrait()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="get_pendency_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_pendency_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_pendency_dialog_label">
+                            我的好友申请
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <table id="get_pendency_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="response_friend_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="response_friend_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="response_friend_dialog_label">
+                            处理好友申请
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;">
+                            <div class="form-group">
+                                <label for="rf_to_account" class="col-sm-2 control-label">对方帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="rf_to_account" 
+                                           placeholder="请输入对方帐号" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="rf_action_radio" class="col-sm-2 control-label">操作</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="rf_action_radio" id="rf_action_agree_and_add_radio" 
+                                               value="Response_Action_AgreeAndAdd" checked> 同意并添加对方为好友
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="rf_action_radio" id="rf_action_agree_radio" 
+                                               value="Response_Action_Agree"> 同意
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="rf_action_radio" id="rf_action_reject_radio" 
+                                               value="Response_Action_Reject"> 拒绝
+                                    </label>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="responseFriend()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="create_group_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="create_group_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="create_group_dialog_label">
+                            创建一个群
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form"  id="cg_form" name="cg_form">
+                            <div class="form-group">
+                                <label  class="col-sm-2 control-label">已选好友</label>
+                                <div class="col-sm-8">
+                                    <!--<input type="text" class="form-control" id="select_friends" value=""
+                                           placeholder="已选好友列表" readonly="readonly">-->
+                                    <textarea class="form-control" id="select_friends"
+                                              rows="3" readonly="readonly"></textarea>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-primary" onclick="selectMyFriendGroup()">
+                                        选择
+                                        </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cg_type_radio" class="col-sm-2 control-label">类型</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="cg_type_radio" id="cg_type_chat_room_radio" 
+                                               value="ChatRoom" checked> 聊天室
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="cg_type_radio" id="cg_type_public_radio" 
+                                               value="Public"> 公开群
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="cg_type_radio" id="cg_type_private_radio" 
+                                               value="Private"> 讨论组
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cg_name" class="col-sm-2 control-label">名称</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="cg_name" value=""
+                                           placeholder="请输入群名称" maxlength="30" onkeydown="if(event.keyCode==13)return false;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cg_notification" class="col-sm-2 control-label">公告</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="cg_notification"
+                                              rows="3" ></textarea>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cg_introduction" class="col-sm-2 control-label">简介</label>
+                                <div class="col-sm-10">
+
+                                    <textarea class="form-control" id="cg_introduction"
+                                              rows="3" ></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="createGroup()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->    
+        
+        <div class="modal fade" id="select_my_friend_group_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="select_my_friend_group_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="select_my_friend_group_dialog_label">
+                            选择好友建群
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <table id="select_my_friend_group_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="search_group_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="search_group_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-full" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="search_group_dialog_label">
+                            搜索群
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <form class="form-inline" role="form"  id="sg_form" name="sg_form">
+                            <div class="form-group">
+                                <label class="sr-only" for="sg_group_id">群ID</label>
+                                <input type="text" class="form-control" id="sg_group_id" value=""
+                                       placeholder="请输入群ID" maxlength="20" onkeydown="if(event.keyCode==13)return false;">
+                            </div>
+
+                            <button type="button" class="btn btn-default" onclick="getGroupPublicInfo()">搜索</button>
+                        </form>
+                        <table id="search_group_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button> 
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="apply_join_group_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="apply_join_group_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="apply_join_group_dialog_label">
+                            申请加群
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form"  id="ajg_form" name="ajg_form">
+                            <input type="hidden"  id="ajg_group_id">
+                            <input type="hidden"  id="ajg_group_type">
+
+                            <div class="form-group">
+                                <label for="ajg_group_name" class="col-sm-2 control-label">群名称</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="ajg_group_name" 
+                                           placeholder="" readonly="readonly">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ajg_apply_msg" class="col-sm-2 control-label">附言</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="ajg_apply_msg" value="你好，我想加入贵群~"
+                                           placeholder="请输入附言" maxlength="50">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="applyJoinGroup()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="get_my_group_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_my_group_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_my_group_dialog_label">
+                            我的群组
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <table id="get_my_group_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="modify_group_msg_flag_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="modify_group_msg_flag_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="modify_group_msg_flag_dialog_label">
+                            修改群消息提示
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;" id="mgmf_form" name="mgmf_form">
+                            <input type="hidden" id="mgmf_sel_row_index"/>
+                            <input type="hidden" id="mgmf_group_id"/>
+
+                            <div class="form-group">
+                                <label for="mgmf_msg_flag_radio" class="col-sm-2 control-label">群消息提示类型</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="mgmf_msg_flag_radio" id="mgmf_mf_aan_radio" 
+                                               value="AcceptAndNotify"> 接收并提示
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="mgmf_msg_flag_radio" id="mgmf_mf_ann_radio" 
+                                               value="AcceptNotNotify"> 接收不提示
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="mgmf_msg_flag_radio" id="mgmf_mf_d_radio" 
+                                               value="Discard"> 屏蔽
+                                    </label>
+
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="modifyGroupMsgFlag()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="get_group_member_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_group_member_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_group_member_dialog_label">
+                            群组成员
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <input type="hidden" id="ggm_group_id"/>
+                        <input type="hidden" id="ggm_my_role"/>
+                        <input type="hidden" id="ggm_group_type"/>
+                        <table id="get_group_member_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="modify_group_member_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="modify_group_member_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="modify_group_member_dialog_label">
+                            修改群成员角色
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;" id="mgm_form" name="mgm_form">
+                            <input type="hidden" id="mgm_sel_row_index"/>
+                            <input type="hidden" id="mgm_group_id"/>
+                            <div class="form-group">
+                                <label for="mgm_account" class="col-sm-2 control-label">成员帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="mgm_account" 
+                                           placeholder="请输入要修改的成员帐号" readonly="readonly">
+                                </div>
+                            </div>
+                            <div class="form-group" id="mgm_role_div">
+                                <label for="mgm_role_radio" class="col-sm-2 control-label">群角色</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="mgm_role_radio" id="mgm_role_admin_radio" 
+                                               value="Admin" > 管理员
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="mgm_role_radio" id="mgm_role_member_radio" 
+                                               value="Member"> 成员
+                                    </label>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="modifyGroupMemberRole()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="delete_group_member_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="delete_group_member_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="delete_group_member_dialog_label">
+                            删除群成员
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;">
+                            <input type="hidden" id="dgm_group_id"/>
+                            <div class="form-group">
+                                <label for="dgm_account" class="col-sm-2 control-label">成员帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="dgm_account" 
+                                           placeholder="请输入要删除成员帐号" readonly="readonly">
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <label for="dgm_silence_radio" class="col-sm-2 control-label">是否静默删除</label>
+                                <div class="col-sm-10">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="dgm_silence_radio" id="dgm_silence_yes_radio" 
+                                               value="1" checked> 是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="dgm_silence_radio" id="dgm_silence_no_radio" 
+                                               value="0"> 否
+                                    </label>
+
+                                </div>
+                            </div>-->
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="deleteGroupMember()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="modify_group_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="modify_group_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="modify_group_dialog_label">
+                            修改群基本资料
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form"  id="mg_form" name="mg_form">
+                            <input type="hidden" id="mg_sel_row_index"/>
+                            <input type="hidden" id="mg_group_id"/>
+                            <div class="form-group">
+                                <label for="mg_name" class="col-sm-2 control-label">名称</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="mg_name"
+                                           placeholder="请输入群名称" maxlength="30" onkeydown="if(event.keyCode==13)return false;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="mg_notification" class="col-sm-2 control-label">公告</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="mg_notification"
+                                              rows="3" ></textarea>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="mg_introduction" class="col-sm-2 control-label">简介</label>
+                                <div class="col-sm-10">
+
+                                    <textarea class="form-control" id="mg_introduction"
+                                              rows="3" ></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="modifyGroup()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="get_my_friend_group_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_my_friend_group_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_my_friend_group_dialog_label">
+                            我的好友
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <input type="hidden" id="gmfg_group_id"/>
+                        <table id="get_my_friend_group_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="add_group_member_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="add_group_member_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="add_group_member_dialog_label">
+                            邀请群成员
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;">
+                            <input type="hidden" id="agm_group_id"/>
+                            <div class="form-group">
+                                <label for="agm_account" class="col-sm-2 control-label">成员帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="agm_account" 
+                                           placeholder="请输入要邀请成员帐号" readonly="readonly">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="addGroupMember()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="forbid_send_msg_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="forbid_send_msg_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="forbid_send_msg_dialog_label">
+                            设置成员禁言时间
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form"  id="fsm_form" name="fsm_form">
+                            <input type="hidden" id="fsm_sel_row_index"/>
+                            <input type="hidden" id="fsm_group_id"/>
+                            <div class="form-group">
+                                <label for="fsm_account" class="col-sm-2 control-label">成员帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="fsm_account" 
+                                           placeholder="请输入要修改的成员帐号" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fsm_shut_up_time" class="col-sm-2 control-label">禁言时间(s)</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="fsm_shut_up_time" 
+                                           placeholder="请输入禁言时间" maxlength="8" onkeydown="if(event.keyCode==13)return false;">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="forbidSendMsg()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <div class="modal" id="select_app_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="select_app_dialog_label" aria-hidden="true" data-backdrop="static" >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h4 class="modal-title" id="select_app_dialog_label">
+                            腾讯开放IM Web Demo(V1.3)
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-5">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="app_type_radio" id="at_demo_radio" 
+                                               value="1" onclick="changeAppType(this)" checked>测试应用
+                                    </label>
+
+                                </div>
+                                <div class="col-sm-5">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="app_type_radio" id="at_myself_radio" 
+                                               value="0" onclick="changeAppType(this)"> 自建应用
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-9">
+                                    <label id="demo_type_desc">无需注册腾讯云帐号直接使用，适合只需快速体验开放IM的用户</label>
+                                    <label id="myself_type_desc">需注册腾讯云官帐号，并创建应用获取SdkAppId和AccountType，适合需在Demo基础上进行修改调试的用户。<a href="http://console.qcloud.com/avc/" id="qcloudLink"  target="_blank">现在创建>></a></label>
+                                </div>
+                            </div>
+                            <div class="form-group" id="sdkAppIdDiv">
+                                <label class="col-sm-2 control-label"></label>
+                                <label for="sdk_app_id" class="col-sm-2 control-label">SdkAppId:</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="sdk_app_id" 
+                                           placeholder="请输入SdkAppId" value="">
+                                </div>
+                            </div>
+                            <div class="form-group" id="accountTypeDiv">
+                                <label class="col-sm-2 control-label"></label>
+                                <label for="account_type" class="col-sm-2 control-label">AccountType:</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="account_type" 
+                                           placeholder="请输入AccountType" value="">
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="selectApp()">
+                            确认
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <div class="modal fade" id="login_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="login_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="login_dialog_label">
+                            登录
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;">
+                            <div class="form-group">
+                                <label for="login_account" class="col-sm-2 control-label">帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="login_account" value="qiyueliuhuo2016"
+                                           placeholder="请输入帐号" maxlength="50" >
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="login_pwd" class="col-sm-2 control-label">密码</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="login_pwd" value="111111"
+                                           placeholder="请输入密码">
+                                </div>
+                            </div>
+
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="c2cLogin()">
+                            确定
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+
+        <div class="modal fade" id="upload_pic_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="upload_pic_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="upload_pic_dialog_label">
+                            发送图片
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;" id="upd_form" name="upd_form">
+                            <div class="form-group">
+                                <label for="File" class="col-sm-2 control-label">选择</label>
+                                <div class="col-sm-10">
+                                    <input type="file" id="upd_pic" onchange="fileOnChange(this)" />
+                                    <!--<input type="button" value="停止" id="upd_abort" />-->
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="File" class="col-sm-2 control-label">预览</label>
+                                <div class="col-sm-10">
+                                    <div id="previewPicDiv"></div>  
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="upd_progress" class="col-sm-2 control-label">进度</label>
+                                <div class="col-sm-10">
+                                    
+                                     <progress id="upd_progress" value="0" max="100"></progress>
+                                    <!--<input type="text" id="upd_progress" value="0" name="upd_progress" />-->
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="uploadPic()">
+                            发送
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <div class="modal fade" id="click_pic_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="click_pic_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="click_pic_dialog_label">
+                            查看图片
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" >
+                            
+                            <div class="form-group">
+                                
+                                <div class="col-sm-12">
+                                    <div id="bigPicDiv"></div>  
+                                </div>
+                            </div>
+                            
+                            
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <!--<button type="button" class="btn btn-primary" id="viewOriPicBt">
+                            查看原图
+                        </button>-->
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <div class="modal fade" id="get_apply_join_group_pendency_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_apply_join_group_pendency_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_apply_join_group_pendency_dialog_label">
+                            我的加群申请
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <table id="get_apply_join_group_pendency_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="handle_ajg_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="handle_ajg_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="handle_ajg_dialog_label">
+                            处理加群申请
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;">
+                            <input type="hidden"  id="hajg_authentication">
+                            <input type="hidden"  id="hajg_msg_key">
+                            <input type="hidden"  id="hajg_user_defined_field">
+                            
+                            <input type="hidden"  id="hajg_from_account">
+                            <input type="hidden"  id="hajg_msg_seq">
+                            <input type="hidden"  id="hajg_msg_random">
+                            <div class="form-group">
+                                <label for="hajg_group_id" class="col-sm-2 control-label">群ID</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="hajg_group_id" 
+                                           placeholder="" readonly="readonly">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="hajg_to_account" class="col-sm-2 control-label">对方帐号</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="hajg_to_account" 
+                                           placeholder="" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="hajg_action_radio" class="col-sm-2 control-label">操作</label>
+                                <div class="col-sm-10">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="hajg_action_radio" id="hajg_action_agree_radio" 
+                                               value="Agree" checked> 同意
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="hajg_action_radio" id="hajg_action_reject_radio" 
+                                               value="Reject"> 拒绝
+                                    </label>
+
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="hajg_approval_msg" class="col-sm-2 control-label">附言</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="hajg_approval_msg"
+                                              rows="3" ></textarea>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="handleApplyJoinGroupPendency()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <div class="modal fade" id="get_my_group_system_msgs_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="get_my_group_system_msgs_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog-wide" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="get_my_group_system_msgs_dialog_label">
+                            我的群组系统消息
+                        </h4>
+                    </div>
+                    <div class="modal-body" >
+                        <table id="get_my_group_system_msgs_table">
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <div class="modal fade" id="edit_custom_msg_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="edit_custom_msg_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="edit_custom_msg_label">
+                            发送自定义消息
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13)return false;" id="ecm_form" name="ecm_form">
+                            <div class="form-group">
+                                <label for="ecm_data" class="col-sm-2 control-label">数据</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="ecm_data"
+                                              rows="3" ></textarea>
+
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ecm_desc" class="col-sm-2 control-label">描述</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="ecm_desc" 
+                                           placeholder="请输入描述" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ecm_ext" class="col-sm-2 control-label">扩展</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="ecm_ext" 
+                                           placeholder="请输入扩展" maxlength="50">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                 data-dismiss="modal" >
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="sendCustomMsg()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+        <div class="modal fade" id="send_group_system_msg_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="send_group_system_msg_dialog_label" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" 
+                                aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="send_group_system_msg_dialog_label">
+                            发送自定义群系统通知
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form"  id="sgsm_form" name="sgsm_form">
+                            
+                            <input type="hidden" id="sgsm_group_id"/>
+                            
+                            <div class="form-group">
+                                <label for="sgsm_content" class="col-sm-2 control-label">内容</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="sgsm_content"
+                                              rows="3" ></textarea>
+
+                                </div>
+                            </div>
+                
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="sendCustomGroupNotify()">
+                            提交
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <script src="//api.html5media.info/1.1.8/html5media.min.js"></script>
+        <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+        <script type="text/javascript" src="js/lib/jquery/jquery.js"></script>
+        <script type="text/javascript" src="js/lib/jquery/jquery-ui.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap/bootstrap.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap/bootstrap-table.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap/bootstrap-collapse.js"></script>
+        <!--TLS web sdk(只用于托管模式，独立模式不用引入)-->
+        <script type="text/javascript" src="https://tls.qcloud.com/libs/api.min.js"></script>
+        <!--用于获取文件MD5 js api-->
+        <script type="text/javascript" src="js/lib/md5/spark-md5.js"></script>
+        <!--<script type="text/javascript" src="js/lib/audiojs/audio.min.js"></script>-->
+        <!--web im sdk-->
+        <script type="text/javascript" src="sdk/webim.js?v=3.1"></script>
+        <script type="text/javascript" src="sdk/json2.js"></script>
+        
+        <script type="text/javascript" src="js/webim_demo_base.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_group.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_group_member.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_group_pendency.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_group_notice.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_friend.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_pendency.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_blacklist.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_profile.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_pic.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_sound.js?v=3.1"></script>
+        <script type="text/javascript" src="js/webim_demo_custom.js?v=3.1"></script>
+        
+        <script type="text/javascript">
+            
+            //官方 demo appid
+            var sdkAppID = 1400001533;
+            var accountType = 792;
+            
+            //TLS登录成功回调地址，也就是第三方应用的首页地址,需要业务自己定义（托管模式下需要定义这个值）
+            //var callBackUrl=null;
+            
+            var maxNameLen=5;//我的好友或群组列表中名称显示最大长度
+            
+            var pageSize = 10;//表格的每页条数，分页时用到
+            var totalCount = 1000;//每次接口请求的条数，分页时用到
+            var MaxMsgLen={//消息最大长度（字节），
+                'C2C':12000,//私聊消息
+                'GROUP':8898//群聊
+            };
+            var SessionType={ //聊天类型，C2C : 私聊，GROUP：群聊
+                'C2C':'C2C',
+                'GROUP':'GROUP'
+            };
+            var selType = SessionType.C2C;//当前聊天类型
+            
+            var selToID = null;//当前选中聊天id（当聊天类型为私聊时，该值为好友帐号，否则为群号）
+            var selSess = null;//当前聊天会话
+            var curMsgCount = 0;//当前聊天会话中的消息数
+            var emotionFlag = false;//是否打开过表情选择框
+            
+            var UploadPicBussinessType={//图片业务类型
+                'GROUP_MSG':1,//私聊图片
+                'C2C_MSG':2,//群聊图片
+                'USER_HEAD':3,//用户头像
+                'GROUP_HEAD':4//群头像
+            };
+            
+            var curPlayAudio=null;//当前正在播放的audio对象
+            
+            
+            //腾讯登录服务错误码（用于托管模式）
+            var TlsErrorCode={
+                'OK':0,//成功
+                'SIGNATURE_EXPIRATION':11//用户身份凭证过期
+            };
+            //当前用户身份
+            var loginInfo = {
+                sdkAppID: 1400008220,//用户所属应用id
+                appIDAt3rd: 1400008220,//用户所属应用id
+                accountType: 4181,//用户所属应用帐号类型
+                identifier: "terry198608",//当前用户ID
+                userSig: "eJxNjVFPgzAUhf9LX2cchXUW3xwSZaIZTp1dljSVXqSOQS11GzH*dysZiffx*8459xs9pctzkefNV2257TSgS*Shsx4rCbVVhQLjoAVjOhzSqUdPWmitJBeWB0b*a7Vyy3vlGJ547qjvDxKOWhngorD9KCaE*C5xsnswrWpqJ3wPE*wHf*1BWrWDfnLqWEgoHv6pd4fvYxYl2TW0CXtL7*Jl2nQdnoViQgJLtVrPFx8rO4r2z9Wx3Iy3a*gOSXn1UDUFe9yMd2HMZrZ6ydVndsNGLtGwUmavK3Ork6yE*UJeROjnF-0TWw8_",//当前用户身份凭证
+                headurl: 'img/2016.gif'//当前用户默认头像
+            };
+            //默认好友头像
+            var friendHeadUrl = 'img/2017.jpg';
+            
+            //监听（多终端同步）群系统消息方法，方法都定义在webim_demo_group_notice.js文件中
+            //注意每个数字代表的含义，比如，
+            //1表示监听申请加群消息，2表示监听申请加群被同意消息，3表示监听申请加群被拒绝消息
+            var groupSystemNotifys={
+                "1": onApplyJoinGroupRequestNotify,//申请加群请求（只有管理员会收到）
+                "2": onApplyJoinGroupAcceptNotify,//申请加群被同意（只有申请人能够收到）
+                "3": onApplyJoinGroupRefuseNotify,//申请加群被拒绝（只有申请人能够收到）
+                "4": onKickedGroupNotify,//被管理员踢出群(只有被踢者接收到)
+                "5": onDestoryGroupNotify,//群被解散(全员接收)
+                "6": onCreateGroupNotify,//创建群(创建者接收)
+                "7": onInvitedJoinGroupNotify,//邀请加群(被邀请者接收)
+                "8": onQuitGroupNotify,//主动退群(主动退出者接收)
+                "9": onSetedGroupAdminNotify,//设置管理员(被设置者接收)
+                "10": onCanceledGroupAdminNotify,//取消管理员(被取消者接收)
+                "11": onRevokeGroupNotify,//群已被回收(全员接收)
+                "255": onCustomGroupNotify//用户自定义通知(默认全员接收)
+            };
+            
+            //IE9(含)以下浏览器用到的jsonp回调函数
+            function jsonpCallback(rspData) {
+                webim.setJsonpLastRspData(rspData);
+            }
+            
+            //监听事件
+            var listeners = {
+                "onConnNotify": null,
+                "jsonpCallback": jsonpCallback,//IE9(含)以下浏览器用到的jsonp回调函数
+                "onMsgNotify": onMsgNotify,//监听新消息(私聊，群聊，群提示消息)事件
+                "onGroupInfoChangeNotify": onGroupInfoChangeNotify,//监听群资料变化事件
+                "groupSystemNotifys": groupSystemNotifys//监听（多终端同步）群系统消息事件
+            };
+            
+            //判断是否已经拿到临时身份凭证
+            if (TLSHelper.getQuery('tmpsig')) {
+                if (loginInfo.identifier == null) {
+                    console.info('start fetchUserSig');
+                    //获取正式身份凭证，成功后会回调tlsGetUserSig(res)函数
+                    TLSHelper.fetchUserSig();
+                }
+            } else {//未登录
+                if (loginInfo.identifier == null) {
+                    //弹出选择应用类型对话框
+                    $('#select_app_dialog').modal('show');
+                    $("body").css("background-color", 'white');
+                }
+            }
+            //获取我的好友列表回调函数
+            function getAllFriendsCallbackOK() {
+                selType == SessionType.C2C && webim.syncMsgs(syncMsgsCallbackOK);
+            }
+
+            //获取我的群组列表回调函数
+            function getGroupsCallbackOK() {
+                selType == SessionType.GROUP && getGroupInfo(selToID, function (resp) {
+                    //拉取最新消息
+                    var opts = {
+                        'GroupId': selToID,
+                        'ReqMsgSeq': resp.GroupInfo[0].NextMsgSeq - 1,
+                        'ReqMsgNumber': 100
+                    };
+                    if (opts.ReqMsgSeq == null || opts.ReqMsgSeq == undefined) {
+                        alert('群消息序列号非法');
+                        return;
+                    }
+                    webim.syncGroupMsgs(opts, syncMsgsCallbackOK);
+                });
+            }
+
+            //获取C2C最新消息或群漫游消息成功回调函数
+            function syncMsgsCallbackOK() {
+
+                if (webim.MsgStore.sessCount() > 0) {
+
+                    var sessMap = webim.MsgStore.sessMap();
+                    for (var i in sessMap) {
+                        //console.info("sessMap[i]=%O",sessMap[i]);
+                        var sess = sessMap[i];
+                        if (selToID == sess.id()) {//处于当前聊天界面
+                            selSess = sess;
+
+                            var msgCount = sess.msgCount();
+                            // add new msgs
+                            if (msgCount > curMsgCount) {
+
+                                for (var mj = curMsgCount; mj < msgCount; mj++) {
+                                    var msg = sess.msg(mj);
+                                    addMsg(msg);
+                                    curMsgCount++;
+                                }
+                                //消息已读上报，以及设置会话自动已读标记
+                                webim.setAutoRead(selSess, true, true);
+                            }
+                        } else {
+                            //更新其他聊天对象的未读消息数
+                            updateSessDiv(sess.type(),sess.id(), sess.unread());
+                        }
+
+                    }
+                }
+            }
+
+            //监听新消息事件
+            function onMsgNotify(newMsg) {
+                //获取所有聊天会话
+                var sessMap = webim.MsgStore.sessMap();
+                for (var i in sessMap) {
+                    var sess = sessMap[i];
+                    if (selToID == sess.id()) {//处于当前聊天界面
+                        selSess = sess;
+                        //获取当前会话消息数
+                        var msgCount = sess.msgCount();
+                        // add new msgs
+                        if (msgCount > curMsgCount) {
+
+                            for (var j = curMsgCount; j < msgCount; j++) {
+                                var msg = sess.msg(j);
+                                //在聊天窗体中新增一条消息
+                                addMsg(msg);
+                                curMsgCount++;
+                            }
+                            //消息已读上报，以及设置会话自动已读标记
+                            webim.setAutoRead(selSess, true, true);
+                        }
+                    } else {
+                        //更新其他聊天对象的未读消息数
+                        updateSessDiv(sess.type(),sess.id(), sess.unread());
+                    }
+
+                }
+            }
+            //好友列表添加一个新好友
+            function addSess(to_id, name, face, unread_msg_count, sesslist) {
+                var sessList = document.getElementsByClassName(sesslist)[0];
+                var index = sessList.childNodes.length;
+                var sessDiv = document.createElement("div");
+                sessDiv.id = "sessDiv_" + to_id;
+                //如果当前选中的用户是最后一个用户
+                sessDiv.className = "sessinfo";
+                //添加单击用户头像事件
+                sessDiv.onclick = function () {
+                    onSelSess(index, to_id, sesslist);
+                };
+                var faceImg = document.createElement("img");
+                faceImg.id = "faceImg_" + to_id;
+                faceImg.className = "face";
+                faceImg.src = face;
+                var nameDiv = document.createElement("div");
+                nameDiv.id = "nameDiv_" + to_id;
+                nameDiv.className = "name";
+                nameDiv.innerHTML = name;
+                var badgeDiv = document.createElement("div");
+                badgeDiv.id = "badgeDiv_" + to_id;
+                badgeDiv.className = "badge";
+                if (unread_msg_count > 0) {
+                    if (unread_msg_count >= 100) {
+                        unread_msg_count = '99+';
+                    }
+                    badgeDiv.innerHTML = "<span>" + unread_msg_count + "</span>";
+                    badgeDiv.style.display = "block";
+                }
+                sessDiv.appendChild(faceImg);
+                sessDiv.appendChild(nameDiv);
+                sessDiv.appendChild(badgeDiv);
+                sessList.appendChild(sessDiv);
+            }
+
+            //更新某一个好友div-未读消息数
+            function updateSessDiv(sess_type,to_id, unread_msg_count) {
+                var badgeDiv = document.getElementById("badgeDiv_" + to_id);
+                if (badgeDiv && unread_msg_count > 0) {
+                    if (unread_msg_count >= 100) {
+                        unread_msg_count = '99+';
+                    }
+                    badgeDiv.innerHTML = "<span>" + unread_msg_count + "</span>";
+                    badgeDiv.style.display = "block";
+                }else if (badgeDiv==null){//没有找到对应的聊天id
+                    if(sess_type==SessionType.C2C){
+                        addSess(to_id,to_id,friendHeadUrl,unread_msg_count,'sesslist');
+                    }
+                    /*else{
+                        addSess(to_id,to_id,friendHeadUrl,unread_msg_count,'sesslist-group');
+                    }*/
+                }
+            }
+            //单击好友或群组头像事件
+            function onSelSess(index, to_id, sessListName) {
+                if (selToID != null && selToID != to_id) {
+
+                    var preSessDiv = document.getElementById("sessDiv_" + selToID);
+                    //将之前选中用户的样式置为未选中样式
+                    preSessDiv.className = "sessinfo";
+                    //设置之前会话的已读消息标记
+                    webim.setAutoRead(selSess, false, false);
+
+                    //设置当前选中用户的样式为选中样式
+                    var curSessDiv = document.getElementById("sessDiv_" + to_id);
+                    curSessDiv.className = "sessinfo-sel";
+                    //curSessDiv.getElementsByClassName("badge")[0].style.display = "none";
+                    var badgeDiv=document.getElementById("badgeDiv_" + to_id);
+                    badgeDiv.style.display = "none";
+                    
+
+                    selToID = to_id;
+                    curMsgCount = 0;
+                    //清空聊天界面
+                    document.getElementsByClassName("msgflow")[0].innerHTML = "";
+
+                    if (sessListName == 'sesslist-group') {
+                        if (selType == SessionType.C2C) {
+                            selType = SessionType.GROUP;
+                        }
+                        selSess = null;
+                        webim.MsgStore.delSessByTypeId(selType, selToID);
+                        getGroupInfo(selToID, function (resp) {
+                            //拉取最新消息
+                            var opts = {
+                                'GroupId': selToID,
+                                'ReqMsgSeq': resp.GroupInfo[0].NextMsgSeq - 1,
+                                'ReqMsgNumber': 100
+                            };
+                            if (opts.ReqMsgSeq == null || opts.ReqMsgSeq == undefined) {
+                                alert('群消息序列号非法');
+                                return;
+                            }
+                            webim.syncGroupMsgs(opts, syncMsgsCallbackOK);
+                        });
+                    } else {
+                        if (selType == SessionType.GROUP) {
+                            selType = SessionType.C2C;
+                        }
+                        selSess = webim.MsgStore.sessByTypeId(selType, selToID);
+                        //webim.MsgStore.resetCookieAndSyncFlag();
+                        webim.syncMsgs(syncMsgsCallbackOK);
+                    }
+
+                }
+
+            }
+
+            //聊天页面增加一条消息
+            function addMsg(msg) {
+                var onemsg = document.createElement("div");
+                onemsg.className = "onemsg";
+                var msghead = document.createElement("p");
+                var msgbody = document.createElement("p");
+                var msgPre = document.createElement("pre");
+                msghead.className = "msghead";
+                msgbody.className = "msgbody";
+                //如果是发给自己的消息
+                if (!msg.isSend)
+                    msghead.style.color = "blue";
+                //昵称  消息时间
+                msghead.innerHTML = (msg.isSend ? loginInfo.identifier : msg.fromAccount)
+                        + "&nbsp;&nbsp;" + webim.Tool.formatTimeStamp(msg.time);
+                //业务可以自定义设置消息的显示样式
+                msgPre.innerHTML=msg.toHtml();
+                msgbody.appendChild(msgPre);
+                
+                onemsg.appendChild(msghead);
+                onemsg.appendChild(msgbody);
+                //消息列表
+                var msgflow = document.getElementsByClassName("msgflow")[0];
+                msgflow.appendChild(onemsg);
+                //300ms后,等待图片加载完，滚动条自动滚动到底部
+                setTimeout(function(){
+                    msgflow.scrollTop = msgflow.scrollHeight;
+                },300);
+                
+            }
+            //发送消息
+            function onSendMsg() {
+                //selToID='peaker4';
+                if (!selToID) {
+                    alert("您还没有好友，暂不能聊天");
+                    $("#send_msg_text").val('');
+                    return;
+                }
+                //获取消息内容
+                var msgtosend = document.getElementsByClassName("msgedit")[0].value;
+                var msgLen = webim.Tool.getStrBytes(msgtosend);
+                
+                if (msgtosend.length < 1) {
+                    alert("发送的消息不能为空!");
+                    $("#send_msg_text").val('');
+                    return;
+                }
+                var maxLen,errInfo;
+                if(selType==SessionType.C2C){
+                    maxLen=MaxMsgLen.C2C;
+                    errInfo="消息长度超出限制(最多"+Math.round(maxLen/3)+"汉字)";
+                }else{
+                    maxLen=MaxMsgLen.GROUP;
+                    errInfo="消息长度超出限制(最多"+Math.round(maxLen/3)+"汉字)";
+                }
+                if (msgLen > maxLen) {
+                    alert(errInfo);
+                    return;
+                }
+                if (!selSess) {
+                    selSess = new webim.Session(selType, selToID, selToID, friendHeadUrl, Math.round(new Date().getTime() / 1000));
+                }
+                var msg = new webim.Msg(selSess, true);
+                //解析文本和表情
+                var expr = /\[[^[\]]{1,3}\]/mg;
+                var emotions = msgtosend.match(expr);
+                if (!emotions || emotions.length < 1) {
+                    var text_obj = new webim.Msg.Elem.Text(msgtosend);
+                    msg.addText(text_obj);
+                } else {
+                    
+                    for (var i = 0; i < emotions.length; i++) {
+                        var tmsg = msgtosend.substring(0, msgtosend.indexOf(emotions[i]));
+                        if (tmsg) {
+                            var text_obj = new webim.Msg.Elem.Text(tmsg);
+                            msg.addText(text_obj);
+                        }
+                        var emotion = webim.EmotionPicData[emotions[i]];
+                        if (emotion) {
+                            
+                            var face_obj = new webim.Msg.Elem.Face(webim.EmotionPicDataIndex[emotions[i]], emotions[i]);
+                            msg.addFace(face_obj);
+
+                        } else {
+                            var text_obj = new webim.Msg.Elem.Text(emotions[i]);
+                            msg.addText(text_obj);
+                        }
+                        var restMsgIndex = msgtosend.indexOf(emotions[i]) + emotions[i].length;
+                        msgtosend = msgtosend.substring(restMsgIndex);
+                    }
+                    if (msgtosend) {
+                        var text_obj = new webim.Msg.Elem.Text(msgtosend);
+                        msg.addText(text_obj);
+                    }
+                }
+ 
+                webim.sendMsg(msg, function (resp) {
+                    //if(selType==SessionType.C2C){
+                        addMsg(msg);
+                        curMsgCount++;
+                    //}
+                    $("#send_msg_text").val('');
+                    turnoffFaces_box(); 
+                }, function (err) {
+                    alert(err.ErrorInfo);
+                    $("#send_msg_text").val('');
+                });
+            }
+            //发送文本框按下键盘事件
+            function onTextareaKeyDown() {
+                if (event.keyCode == 13) {
+                    onSendMsg();
+                }
+            }
+            //关闭聊天界面
+            function onClose() {
+                document.getElementById("webim_demo").style.display = "none";
+                //离线
+                webim.offline();
+            }
+
+            //打开表情窗体
+            var showEmotionDialog = function () {
+                if (emotionFlag) {
+                    $('#wl_faces_box').css({
+                        "display": "block"
+                    });
+                    return;
+                }
+
+                emotionFlag = true;
+                // webim.EmotionPicData设置表情的json数组
+                var emotionPicData= webim.EmotionPicData;
+                for (var key in emotionPicData) {
+                    var emotions = $('<img>').attr({
+                        "id": key,
+                        "src": emotionPicData[key],
+                        "style": "cursor:pointer;"
+                    }).click(function () {
+                        selectEmotionImg(this);
+                    });
+                    $('<li>').append(emotions).appendTo($('#emotionUL'));
+                }
+                $('#wl_faces_box').css({
+                    "display": "block"
+                });
+            };
+
+            //表情选择div的关闭方法
+            var turnoffFaces_box = function () {
+                $("#wl_faces_box").fadeOut("slow");
+            };
+            //选中表情
+            var selectEmotionImg = function (selImg) {
+                var txt = document.getElementsByClassName("msgedit")[0];
+                txt.value = txt.value + selImg.id;
+                txt.focus();
+            };
+        </script>
+
+    </body>
+</html>

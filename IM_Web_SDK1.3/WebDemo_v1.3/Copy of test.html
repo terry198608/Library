@@ -1,0 +1,136 @@
+<html>
+    <head>
+        <title>腾讯IM Web Demo(V1.3)</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="css/webim_demo.css" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-table.css" />
+        <style>
+            .ui-menu { width: 150px; }
+        </style>
+        <script type="text/javascript" src="sdk/json2.js"></script>
+        <!--web im sdk-->
+        <script type="text/javascript" src="sdk/webim.js"></script>
+        <!--用于获取文件MD5，上传图片需要先获取文件的MD5-->
+        <script type="text/javascript" src="js/lib/md5/spark-md5.js"></script>
+    </head>
+    <body>
+        
+<script>
+//当前用户身份
+var loginInfo = {
+    sdkAppID: 1400008220, //用户所属应用id
+    appIDAt3rd: 1400008220, //用户所属应用id
+    accountType: 4181, //用户所属应用帐号类型
+    identifier: "terry198608", //当前用户ID
+    userSig: "eJxNjVFPgzAUhf9LX2cchXUW3xwSZaIZTp1dljSVXqSOQS11GzH*dysZiffx*8459xs9pctzkefNV2257TSgS*Shsx4rCbVVhQLjoAVjOhzSqUdPWmitJBeWB0b*a7Vyy3vlGJ547qjvDxKOWhngorD9KCaE*C5xsnswrWpqJ3wPE*wHf*1BWrWDfnLqWEgoHv6pd4fvYxYl2TW0CXtL7*Jl2nQdnoViQgJLtVrPFx8rO4r2z9Wx3Iy3a*gOSXn1UDUFe9yMd2HMZrZ6ydVndsNGLtGwUmavK3Ork6yE*UJeROjnF-0TWw8_", //当前用户身份凭证
+    headurl: 'img/2016.gif'//当前用户默认头像
+};
+ 
+//监听新消息事件
+function onMsgNotify(newMsg) {
+    //获取所有聊天会话
+    var sessMap = webim.MsgStore.sessMap();
+    for (var i in sessMap) {
+        var sess = sessMap[i];
+        if (selToID == sess.id()) {//处于当前聊天界面
+            selSess = sess;
+            //获取当前会话消息数
+            var msgCount = sess.msgCount();
+            // add new msgs
+            if (msgCount > curMsgCount) {
+ 
+                for (var j = curMsgCount; j < msgCount; j++) {
+                    var msg = sess.msg(j);
+                    //在聊天窗体中新增一条消息
+                    addMsg(msg);
+                    curMsgCount++;
+                }
+                //消息已读上报，以及设置会话自动已读标记
+                webim.setAutoRead(selSess, true, true);
+            }
+        } else {
+            //更新其他聊天对象的未读消息数
+            updateSessDiv(sess.id(), sess.unread());
+        }
+ 
+    }
+}
+//
+//监听（多终端同步）群系统消息方法，方法都定义在webim_demo_group_notice.js文件中
+//注意每个数字代表的含义，比如，
+//1表示监听申请加群消息，2表示监听申请加群被同意消息，3表示监听申请加群被拒绝消息
+// var groupSystemNotifys = {
+//     "1": onApplyJoinGroupRequestNotify, //申请加群请求（只有管理员会收到）
+//     "2": onApplyJoinGroupAcceptNotify, //申请加群被同意（只有申请人能够收到）
+//     "3": onApplyJoinGroupRefuseNotify, //申请加群被拒绝（只有申请人能够收到）
+//     "4": onKickedGroupNotify, //被管理员踢出群(只有被踢者接收到)
+//     "5": onDestoryGroupNotify, //群被解散(全员接收)
+//     "6": onCreateGroupNotify, //创建群(创建者接收)
+//     "7": onInvitedJoinGroupNotify, //邀请加群(被邀请者接收)
+//     "8": onQuitGroupNotify, //主动退群(主动退出者接收)
+//     "9": onSetedGroupAdminNotify, //设置管理员(被设置者接收)
+//     "10": onCanceledGroupAdminNotify, //取消管理员(被取消者接收)
+//     "11": onRevokeGroupNotify, //群已被回收(全员接收)
+//     "255": onCustomGroupNotify//用户自定义通知(默认全员接收,暂不支持)
+// };
+ 
+//监听事件
+var listeners = {
+    "onConnNotify": null,
+    "onMsgNotify": onMsgNotify //监听新消息(私聊，群聊，群提示消息)事件
+    //"onGroupInfoChangeNotify": onGroupInfoChangeNotify, //监听群资料变化事件
+    //"groupSystemNotifys": groupSystemNotifys//监听（多终端同步）群系统消息事件
+};
+ 
+//初始化demo
+function initDemoApp() {
+    /*$("body").css("background-color", '#2f2f2f');
+    document.getElementById("webim_demo").style.display = "block";//展开聊天界面
+    document.getElementById("p_my_face").src = loginInfo.headurl;
+    document.getElementById("t_my_name").innerHTML = loginInfo.identifier;
+    //菜单
+    $("#t_my_menu").menu();*/
+    //web sdk 初始化
+    webim.init(loginInfo, listeners, null);
+    //读取我的好友列表
+    //getAllFriend(getAllFriendsCallbackOK);
+    //读取我的群组列表
+    //getJoinedGroupListHigh();
+    // $("#send_msg_text").focus();
+    //初始化我的加群申请表格
+    //initGetApplyJoinGroupPendency([]);
+    //初始化我的群组系统消息表格
+    //initGetMyGroupSystemMsgs([]);
+}
+initDemoApp();
+var tag_list = [
+        "Tag_Profile_IM_Nick",
+        "Tag_Profile_IM_Gender",
+        "Tag_Profile_IM_AllowType"
+    ];
+var options = {
+        'From_Account': loginInfo.identifier,
+        'To_Account': ["1"],
+        'LastStandardSequence': 0,
+        'TagList': tag_list
+ };
+ webim.getProfilePortrait(
+            options,
+            function (resp) {
+                if (resp.UserProfileItem && resp.UserProfileItem.length > 0) {
+                    for (var i in resp.UserProfileItem) {
+                        
+                    }
+                    }
+            },
+            function (err) {
+                alert(err.ErrorInfo);
+            }
+)
+</script>
+    </body>
+
+</html>

@@ -1,0 +1,56 @@
+request body = <TemplateSMS>
+                    <to></to> 
+                    <appId>8a48b5514eaf512c014eb4e24e9008b2</appId>
+                    <templateId></templateId>
+                    <datas><data></data><data></data></datas>
+                  </TemplateSMS>
+request url = https://sandboxapp.cloopen.com:8883/2013-12-26/Accounts/aaf98f894eaeb647014eb4e108a40964/SMS/TemplateSMS?sig=8064E0A73333274427ACDD365CF7AA02
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Response><statusCode>112306</statusCode><statusMsg>【短信】接收模板短信的手机号码为空</statusMsg></Response>
+request body = <TemplateSMS>
+                    <to>1343811672</to> 
+                    <appId>8a48b5514eaf512c014eb4e24e9008b2</appId>
+                    <templateId>1</templateId>
+                    <datas><data>123456</data><data>5</data></datas>
+                  </TemplateSMS>
+request url = https://sandboxapp.cloopen.com:8883/2013-12-26/Accounts/aaf98f894eaeb647014eb4e108a40964/SMS/TemplateSMS?sig=06556907A1D66F2F220F4D3C598567DA
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Response><statusCode>112310</statusCode><statusMsg>【短信】应用未上线，模板短信接收号码外呼受限</statusMsg></Response>
+request body = <TemplateSMS>
+                    <to>1343811672</to> 
+                    <appId>8a48b5514eaf512c014eb4e24e9008b2</appId>
+                    <templateId></templateId>
+                    <datas><data>123456</data><data>5</data></datas>
+                  </TemplateSMS>
+request url = https://sandboxapp.cloopen.com:8883/2013-12-26/Accounts/aaf98f894eaeb647014eb4e108a40964/SMS/TemplateSMS?sig=0C55E39B64D3176AF158A01DFBCCEE2D
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Response><statusCode>112307</statusCode><statusMsg>【短信】模板短信模板ID为空</statusMsg></Response>
+request body = <TemplateSMS>
+                    <to>1343811672</to> 
+                    <appId>8a48b5514eaf512c014eb4e24e9008b2</appId>
+                    <templateId>1</templateId>
+                    <datas><data>123456</data><data>5</data></datas>
+                  </TemplateSMS>
+request url = https://sandboxapp.cloopen.com:8883/2013-12-26/Accounts/aaf98f894eaeb647014eb4e108a40964/SMS/TemplateSMS?sig=E69B6BB89CD4388FF6A9A32519C50513
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Response><statusCode>112310</statusCode><statusMsg>【短信】应用未上线，模板短信接收号码外呼受限</statusMsg></Response>
+request body = <TemplateSMS>
+                    <to>15682381509</to> 
+                    <appId>8a48b5514eaf512c014eb4e24e9008b2</appId>
+                    <templateId>1</templateId>
+                    <datas><data>123456</data><data>5</data></datas>
+                  </TemplateSMS>
+request url = https://sandboxapp.cloopen.com:8883/2013-12-26/Accounts/aaf98f894eaeb647014eb4e108a40964/SMS/TemplateSMS?sig=11AF04DD029257E0A14C3D0596B5E8C0
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Response><statusCode>000000</statusCode><TemplateSMS><dateCreated>20150724153222</dateCreated><smsMessageSid>201507241532221722001</smsMessageSid></TemplateSMS></Response>
+request body = <TemplateSMS>
+                    <to>13438116372</to> 
+                    <appId>8a48b5514eaf512c014eb4e24e9008b2</appId>
+                    <templateId>1</templateId>
+                    <datas><data>123456</data><data>5</data></datas>
+                  </TemplateSMS>
+request url = https://sandboxapp.cloopen.com:8883/2013-12-26/Accounts/aaf98f894eaeb647014eb4e108a40964/SMS/TemplateSMS?sig=D76B1E7C3A8AF61DEBCD36896AA4DF5C
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Response><statusCode>000000</statusCode><TemplateSMS><dateCreated>20150724153657</dateCreated><smsMessageSid>201507241536571724357</smsMessageSid></TemplateSMS></Response>
+request body = <TemplateSMS>
+                    <to>13438116372</to> 
+                    <appId>8a48b5514eaf512c014eb4e24e9008b2</appId>
+                    <templateId>1</templateId>
+                    <datas><data>123456</data><data>5</data></datas>
+                  </TemplateSMS>
+request url = https://sandboxapp.cloopen.com:8883/2013-12-26/Accounts/aaf98f894eaeb647014eb4e108a40964/SMS/TemplateSMS?sig=BE29C76F18791156564EBCC445A8360C
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Response><statusCode>160021</statusCode><statusMsg>同一手机相同内容限定时间内只能发一次:13438116372:【云通讯】您使用的是云通讯短信模板，您的验证码是123456，请于5分钟内正确输入</statusMsg></Response>

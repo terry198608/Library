@@ -1,40 +1,42 @@
 <?php
-$fp = fsockopen("219.141.185.227", 10024, $errno, $errstr, 10);
-if($fp) echo 'success123';
-exit;
-//$address = '192.168.10.170';
-$address = '219.141.185.227';
-$port = 10024;
-
-/* Create a TCP/IP socket. */
-$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-if ($socket === false) {
-    echo "socket_create() failed: reason: " . socket_strerror(socket_last_error()) . "\n";
-} else {
-    echo "OK.\n";
+/**
+ * SelectSocket Test Client
+ * By James.Huang <shagoo#gmail.com>
+**/
+function debug ($msg)
+{
+  echo $msg;
+//    error_log($msg, 3, '/tmp/socket.log');
 }
-    //echo "Attempting to connect to '$address' on port '$service_port'...";
-$result = socket_connect($socket, $address, $port);
-if ($result === false) {
-    echo "socket_connect() failed.\nReason: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
-} else {
-    echo "OK.\n";
+if ($argv[1]) {
+    $socket_client = stream_socket_client('tcp://0.0.0.0:2000', $errno, $errstr, 30);
+    
+//  stream_set_timeout($socket_client, 0, 100000);
+    
+    if (!$socket_client) {
+        die("$errstr ($errno)");
+    } else {
+        $msg = trim($argv[1]);
+        for ($i = 0; $i < 10; $i++) {
+            $res = fwrite($socket_client, "$msg($i)/n");
+            usleep(100000);
+//          debug(fread($socket_client, 1024)); // 将产生死锁，因为 fread 在阻塞模式下未读到数据时将等待
+        }
+        fwrite($socket_client, "quit/n"); // add end token
+        debug(fread($socket_client, 1024));
+        fclose($socket_client);
+    }
 }
-
-$in = "HEAD / HTTP/1.1\r\n";
-$in .= "Host: www.example.com\r\n";
-$in .= "Connection: Close\r\n\r\n";
-$out = '';
-
-echo "Sending HTTP HEAD request...";
-socket_write($socket, $in, strlen($in));
-echo "OK.\n";
-
-echo "Reading response:\n\n";
-while ($out = socket_read($socket, 2048)) {
-    echo $out;
+else {
+    $phArr = array();
+    for ($i = 0; $i < 5; $i++) {
+        $phArr[$i] = popen("php ".__FILE__." '{$i}:test'", 'r');
+    }
+    foreach ($phArr as $ph) {
+        pclose($ph);
+    }
+    
+//  for ($i = 0; $i < 10; $i++) {
+//      system("php ".__FILE__." '{$i}:test'");
+//  }
 }
-
-echo "Closing socket...";
-socket_close($socket);
-echo "OK.\n\n";
